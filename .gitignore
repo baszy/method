@@ -1,0 +1,13 @@
+# Compiled binaries
+bin/
+build/
+docs/
+
+# Build remnants
+*.o
+*.a
+*.so
+
+# Text editor turds
+*~
+*.swp
