@@ -1,0 +1,26 @@
+set(METHOD_SOURCE_DIRS
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+PARENT_SCOPE)
+
+set(METHOD_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/MAngle.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Component/MCamera.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Component/MModel.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Component/MTransformation.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MEntity.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MGLDebugCallback.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MGLRenderSystem.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MGLShader.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MGLVAO.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MGLWindow.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MMappedFile.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MMatrix.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MMeshData.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MOBJLoader.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MReadFile.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MRenderSystem.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MRenderTarget.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MScene.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MShader.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/MVector.cpp"
+PARENT_SCOPE)

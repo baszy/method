@@ -1,0 +1,15 @@
+# glad
+set(GLAD_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+set(GLAD_PROFILE "core")
+set(GLAD_API "gl=4.5")
+set(GLAD_GENERATOR "c")
+set(GLAD_EXTENSIONS "GL_KHR_debug")
+set(GLAD_SPEC "gl")
+option(GLAD_ALL_EXTENSIONS OFF)
+option(GLAD_NO_LOADER OFF)
+option(GLAD_REPRODUCIBLE OFF)
+add_subdirectory("glad/")
+
+# Pass variables through
+set(GLAD_LIBRARIES ${GLAD_LIBRARIES} PARENT_SCOPE)
+set(GLAD_INCLUDE_DIRS ${GLAD_INCLUDE_DIRS} PARENT_SCOPE)
