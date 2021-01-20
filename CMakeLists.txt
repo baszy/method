@@ -60,8 +60,9 @@ if(DOXYGEN_FOUND)
 
     set(DOXYGEN_GENERATE_HTML YES)
 
-    doxygen_add_docs(doxygen_documetation ALL ${METHOD_INCLUDE_DIRS}
-        ${METHOD_SOURCE_DIRS} ${METHOD_DOXYGEN_DOX_DIRS})
+    # uncomment for doxygen build
+    # doxygen_add_docs(doxygen_documetation ALL ${METHOD_INCLUDE_DIRS}
+    #    ${METHOD_SOURCE_DIRS} ${METHOD_DOXYGEN_DOX_DIRS})
 else()
     message("Doxygen must be installed to generate documentation")
 endif()
