@@ -18,6 +18,7 @@ void Controller::update() {
 
     const uint8_t * keystate = SDL_GetKeyboardState(NULL);
     this->running = (keystate[SDL_SCANCODE_ESCAPE]) ? false : true;
+    this->test_axis = (keystate[SDL_SCANCODE_R]) ? false : true;
     this->direction_axis.z = (keystate[SDL_SCANCODE_W]) ? -1 : this->direction_axis.z;
     this->direction_axis.z = (keystate[SDL_SCANCODE_S]) ? 1 : this->direction_axis.z;
     this->direction_axis.y = (keystate[SDL_SCANCODE_LSHIFT]) ? -1 : this->direction_axis.y;

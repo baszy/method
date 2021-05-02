@@ -67,9 +67,9 @@ template <typename Type>
 TVec2<Type> normalize(TVec2<Type> source) {
     TVec2<Type> result;
 
-    Type m = magnitude(source);
-    result.x = source.x / m;
-    result.y = source.y / m;
+    Type m = 1 / magnitude(source);
+    result.x = source.x * m;
+    result.y = source.y * m;
 
     return result;
 }

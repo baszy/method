@@ -1,8 +1,6 @@
 #pragma once
 
-#include <memory>
 #include <string>
-#include <unordered_map>
 
 #include "MeshData.hpp"
 
@@ -10,7 +8,6 @@
 
 namespace method {
 
-// Anyway this function assumes you own the pointer and will free it later
-MeshData * load_obj(const std::string & filename);
+MeshData * load_obj(const std::string & path);
 
 }

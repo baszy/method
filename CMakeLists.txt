@@ -27,6 +27,17 @@ target_link_libraries(method PRIVATE ${GL_LIBRARIES} ${SDL2_LIBRARIES}
 target_compile_options(method PRIVATE ${GL_CFLAGS_OTHER} ${SDL2_CFLAGS_OTHER}
     ${X11_CFLAGS_OTHER} -g -Wall -Wextra)
 
+# Tools
+# add_subdirectory("tools/")
+# 
+# add_executable(method_builder ${METHOD_BUILDER_SOURCES})
+# set_target_properties(method_builder PROPERTIES LINKER_LANGUAGE CXX
+#     CXX_STANDARD 11)
+# 
+# target_include_directories(method_builder PUBLIC "tools/")
+# target_link_libraries(method_builder PRIVATE method)
+# target_compile_options(method_builder PRIVATE -g -Wall -Wextra)
+
 # Example project
 add_subdirectory("example/")
 
@@ -40,6 +51,9 @@ target_compile_options(method_example PRIVATE -g -Wall -Wextra)
 
 # Generating documentation using Doxygen
 find_package(Doxygen)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 
 if(DOXYGEN_FOUND)
     set(DOXYGEN_PROJECT_NAME ${PROJECT_NAME})
@@ -62,7 +76,7 @@ if(DOXYGEN_FOUND)
 
     # uncomment for doxygen build
     # doxygen_add_docs(doxygen_documetation ALL ${METHOD_INCLUDE_DIRS}
-    #    ${METHOD_SOURCE_DIRS} ${METHOD_DOXYGEN_DOX_DIRS})
+    #     ${METHOD_SOURCE_DIRS} ${METHOD_DOXYGEN_DOX_DIRS})
 else()
     message("Doxygen must be installed to generate documentation")
 endif()

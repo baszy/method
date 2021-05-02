@@ -40,6 +40,15 @@ TVec3<Type> operator + (const TVec3<Type> & lhs, const TVec3<Type> & rhs) {
     return result;
 }
 
+// TODO: This must be implemented for other vector sizes as well
+template <typename Type>
+TVec3<Type> operator += (TVec3<Type> & lhs, const TVec3<Type> & rhs) {
+    lhs.x += rhs.x;
+    lhs.y += rhs.y;
+    lhs.z += rhs.z;
+    return lhs;
+}
+
 template <typename Type>
 TVec3<Type> operator - (const TVec3<Type> & lhs, const TVec3<Type> & rhs) {
     TVec3<Type> result;
@@ -83,10 +92,10 @@ template <typename Type>
 TVec3<Type> normalize(const TVec3<Type> & source) {
     TVec3<Type> result;
 
-    Type m = magnitude(source);
-    result.x = source.x / m;
-    result.y = source.y / m;
-    result.z = source.z / m;
+    Type m = 1 / magnitude(source);
+    result.x = source.x * m;
+    result.y = source.y * m;
+    result.z = source.z * m;
 
     return result;
 }

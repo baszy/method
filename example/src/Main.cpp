@@ -1,11 +1,11 @@
-#include <chrono>
 #include <iostream>
-#include <memory>
-#include <random>
-#include <vector>
+
+#include <SDL2/SDL.h>
 
 #include "Angle.hpp"
 #include "Camera.hpp"
+#include "Controller.hpp"
+#include "Defs.hpp"
 #include "Entity.hpp"
 #include "GLShader.hpp"
 #include "Material.hpp"
@@ -13,15 +13,11 @@
 #include "MeshData.hpp"
 #include "OBJLoader.hpp"
 #include "ReadFile.hpp"
-#include "RenderTarget.hpp"
+#include "Window.hpp"
 #include "RenderSystem.hpp"
 #include "Scene.hpp"
 #include "Terrain.hpp"
 #include "Vector.hpp"
-
-#include "GLTexture.hpp"
-#include "TGAImage.hpp"
-#include "Controller.hpp"
 
 using namespace method;
 
@@ -32,81 +28,87 @@ float clamp(float input, float min, float max) {
 }
 
 int main() {
-    // TODO: (global) path or filename?
-
-    RenderTarget window("method_example", IVec2(1280, 720));
+    // TODO: This doesnt work with sizes different than the framebuffer ???
+    Window window("method_example", IVec2(1920, 1080));
     window.set_swap_mode(SwapMode::VSYNC);
-    RenderSystem renderer = RenderSystem(&window);
+    window.set_fullscreen(true);
+
+    Framebuffer framebuffer(IVec2(1920, 1080), false);
+
+    MeshManager mesh_manager = MeshManager("example/resource/");
+    TextureManager tex_manager = TextureManager("example/img/");
 
     Controller input = Controller();
-    input.grab_cursor(false);
+    input.grab_cursor(true);
 
     GLShader shader = GLShader();
-    shader.load("example/shader/phong.vert", ShaderType::VERTEX);
-    shader.load("example/shader/phong.frag", ShaderType::FRAGMENT);
+    shader.load("shader/blinn.vert", ShaderType::VERTEX);
+    shader.load("shader/blinn.frag", ShaderType::FRAGMENT);
     shader.compile();
 
+    RenderSystem renderer = RenderSystem(framebuffer, mesh_manager, tex_manager);
+
     IVec2 size = window.get_dimensions();
-    Camera camera = Camera(radians(70.0f), (float)size.x / (float)size.y,
-        0.1f, 500.0f);
+    Camera camera = Camera(radians(70.0f), (float)size.x / (float)size.y, 0.1f, 500.0f);
 
-    Light light = Light();
-    light.position = Vec3(5.0f, 5.0f, 5.0f);
-    light.color = Vec3(1.0f, 1.0f, 1.0f);
+    Material moss_brick = Material();
+    moss_brick.diffuse_color = Vec3(0.571f, 0.580f, 0.504f);
+    moss_brick.specular_exponent = 4;
+    moss_brick.diffuse_map_handle = tex_manager.index_of("moss_brick/diffuse.tga");
+    moss_brick.normal_map_handle = tex_manager.index_of("moss_brick/normal.tga");
+    moss_brick.displacement_map_handle = tex_manager.index_of("moss_brick/displacement.tga");
+    moss_brick.shader = &shader;
 
-    TGAImage * crate_diffuse_image = new TGAImage("example/img/wood_floor/diffuse.tga");
-    GLTexture crate_diffuse = GLTexture(crate_diffuse_image);
-    TGAImage * crate_normal_image = new TGAImage("example/img/wood_floor/normal.tga");
-    GLTexture crate_normal = GLTexture(crate_normal_image);
-    TGAImage * crate_specular_image = new TGAImage("example/img/wood_floor/specular.tga");
-    GLTexture crate_specular = GLTexture(crate_specular_image);
-
-    Material * crate = new Material();
-    crate->diffuse_color = Vec3(0.329, 0.235, 0.145);
-    crate->specular_exponent = 256;
-    crate->diffuse_map = &crate_diffuse;
-    crate->normal_map = &crate_normal;
-    crate->specular_map = &crate_specular;
-    crate->shader = &shader;
-
-    MeshData * mesh = load_obj("example/resource/stanford_dragon.obj");
-    Prop object = Prop(mesh, crate);
-    object.set_position(Vec3(0.0f, 1.0f, 0.0f));
-    object.set_scale(Vec3(10.0f, 10.0f, 10.0f));
-    
-    TGAImage * bog_diffuse_image = new TGAImage("example/img/ground/diffuse.tga");
-    GLTexture bog_diffuse = GLTexture(bog_diffuse_image);
-    TGAImage * bog_normal_image = new TGAImage("example/img/ground/normal.tga");
-    GLTexture bog_normal = GLTexture(bog_normal_image);
-    TGAImage * bog_specular_image = new TGAImage("example/img/ground/specular.tga");
-    GLTexture bog_specular = GLTexture(bog_specular_image);
-
-    Material * bog = new Material();
-    bog->diffuse_color = Vec3(0.969, 0.647, 0.463);
-    bog->specular_exponent = 32;
-    bog->diffuse_map = &bog_diffuse;
-    bog->normal_map = &bog_normal;
-    bog->specular_map = &bog_specular;
-    bog->shader = &shader;
-
-    MeshData * triangles = new_terrain(4, 200.0f, 200.0f);
-    Prop ground = Prop(triangles, bog);
-    ground.set_position(Vec3(-100.0f, 0.0f, -100.0f));
+    Material wood_floor = Material();
+    wood_floor.diffuse_color = Vec3(0.716f, 0.532f, 0.333f);
+    wood_floor.specular_exponent = 2048;
+    wood_floor.diffuse_map_handle = tex_manager.index_of("wood_floor/diffuse.tga");
+    wood_floor.normal_map_handle = tex_manager.index_of("wood_floor/normal.tga");
+    wood_floor.displacement_map_handle = tex_manager.index_of("wood_floor/displacement.tga");
+    wood_floor.shader = &shader;
 
     Scene scene = Scene();
-    scene.cameras.push_back(&camera);
-    scene.lights.push_back(&light);
-    scene.props.push_back(&object);
-    scene.props.push_back(&ground);
 
-    Vec3 pos, vel;
-    Vec2 angles;
-    float speed = 0.05f;
-    mat4 transform;
+    scene.camera = &camera;
 
-    int frame = 0;
+    /* You can add point lights to the scene like this:
+     *
+     * PointLight light1 = { .position = Vec3(0.0f, 0.0f, 0.0f),
+     *                       .color = Vec3(1.0f, 0.0f, 0.0f) };
+     * PointLight light2 = { .position = Vec3(0.0f, 0.0f, 0.0f),
+     *                       .color = Vec3(0.0f, 1.0f, 0.0f) };
+     * PointLight light3 = { .position = Vec3(0.0f, 0.0f, 0.0f),
+     *                       .color = Vec3(0.0f, 0.0f, 2.2f) };
+     * PointLight light4 = { .position = Vec3(0.0f, 0.0f, 0.0f),
+     *                       .color = normalize(Vec3(1.0f, 1.0f, 0.0f)) };
+     * scene.add_point_light(light1);
+     * scene.add_point_light(light2);
+     * scene.add_point_light(light3);
+     * scene.add_point_light(light4);
+     */
+
+    DirectionLight sun = { .direction = Vec3(1.0f, 0.15f, 0.0f),
+                           .color = Vec3(1.0f, 1.0f, 1.0f) };
+    scene.set_sun(sun);
+
+    Prop sponza = Prop(mesh_manager.index_of("sponza.obj"), moss_brick);
+    scene.props.push_back(&sponza);
+
+    // 2 units per second
+    float speed = 2.0f;
+
+    // Initial conditions
+    Vec2 angles = Vec2(0.0f, 0.0f);
+    Vec3 pos = Vec3(0.0f, 0.0f, 0.0f);
+
+    float runtime = 0.0f;
+    unsigned int last_time = SDL_GetTicks();
     while (input.running) {
-        vel = Vec3(0.0f, 0.0f, 0.0f);
+        unsigned int current_time = SDL_GetTicks();
+        unsigned int frame_time = current_time - last_time;
+        float seconds = (float)frame_time / 1000.0f;
+        runtime += seconds;
+        last_time = current_time;
 
         input.update();
 
@@ -114,41 +116,43 @@ int main() {
                                radians(-input.mouse_axis.y * 0.05f));
         angles.y = clamp(angles.y, -M_PI_2 + 0.01, M_PI_2 - 0.01);
 
-        Vec3 front(cos(angles.x) * cos(angles.y),
-                   sin(angles.y),
-                   sin(angles.x) * cos(angles.y));
+        // Speed * time = distance :)
+        float distance = speed * seconds;
+
+        /*
+         * scene.point_lights_positions[0] =
+         *     Vec3( 4.0f + sin(1 * M_PI_4 + runtime), 1.5f,  4.0f + cos(1 * M_PI_4 + runtime));
+         * scene.point_lights_positions[1] =
+         *     Vec3(-4.0f + sin(    M_PI_2 + runtime), 1.5f,  4.0f + cos(    M_PI_2 + runtime));
+         * scene.point_lights_positions[2] =
+         *     Vec3( 4.0f + sin(3 * M_PI_4 + runtime), 1.5f, -4.0f + cos(3 * M_PI_4 + runtime));
+         * scene.point_lights_positions[3] =
+         *     Vec3(-4.0f + sin(    M_PI   + runtime), 1.5f, -4.0f + cos(    M_PI   + runtime));
+         */
+
+        scene.sun.direction = Vec3(sin(runtime / 6.0f), sin(runtime / 6.0f), cos(runtime / 6.0f));
+
+        Vec3 front(cos(angles.x), 0, sin(angles.x));
+        Vec3 look(front.x * cos(angles.y),
+                  sin(angles.y),
+                  front.z * cos(angles.y));
         Vec3 up = Vec3(0.0f, 1.0f, 0.0f);
         Vec3 side = normalize(cross(front, up));
 
-        if (input.direction_axis.x > 0) {
-            pos = pos + speed * side;
-        } else if (input.direction_axis.x < 0) {
-            pos = pos - speed * side;
-        }
-        if (input.direction_axis.y > 0) {
-            pos.y = pos.y + speed;
-        } else if (input.direction_axis.y < 0) {
-            pos.y = pos.y - speed;
-        }
-        if (input.direction_axis.z > 0) {
-            pos = pos - speed * front;
-        } else if (input.direction_axis.z < 0) {
-            pos = pos + speed * front;
-        }
+        if (input.direction_axis.x > 0) pos = pos + distance * side;
+        else if (input.direction_axis.x < 0) pos = pos - distance * side;
+        if (input.direction_axis.y > 0) pos = pos + distance * up;
+        else if (input.direction_axis.y < 0) pos = pos - distance * up;
+        if (input.direction_axis.z > 0) pos = pos - distance * front;
+        else if (input.direction_axis.z < 0) pos = pos + distance * front;
 
         camera.set_position(pos);
-        camera.set_look(pos + front);
+        camera.set_look(pos + look);
 
-        renderer.begin();
         renderer.draw(scene);
-        renderer.end();
-
-        frame = (frame + 1);
+        window.draw_framebuffer(framebuffer);
+        window.swap();
     }
-
-    // TODO: :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :( :(
-    delete mesh;
-    delete triangles;
 
     return 0;
 }

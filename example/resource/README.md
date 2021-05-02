@@ -1,6 +1,7 @@
 ## License
 `stanford_dragon.obj` © 1996 Stanford University \
-`utah_teapot.obj` © 1975 Martin Newell
+`utah_teapot.obj` © 1975 Martin Newell \
+`sponza.obj` © 2002 Marko Dabrovic
 
 Data has been re-processed in order to keep compatibility and reduce filesize.
 

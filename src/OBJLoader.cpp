@@ -1,11 +1,12 @@
 #include "OBJLoader.hpp"
 
 #include <fstream>
-#include <iostream>
-#include <stdexcept>
+#include <memory>
+#include <vector>
 
 namespace method {
 
+// see C++11 (draft N3337) §3.5/4
 namespace {
 
 Vec3 process_v(const std::string & line) {
@@ -62,21 +63,20 @@ void process_f(const std::string & line, IVec3 * face, IVec3 * uv,
 
 }
 
-// TODO: why why why does this return a pointer
-MeshData * load_obj(const std::string & filename) {
-    std::ifstream file(filename);
+MeshData * load_obj(const std::string & path) {
+    std::ifstream file(path);
 
-    // TODO: instead of throwing exception, deal with error locally
-    if (file.fail())
-        throw std::runtime_error("File could not be opened");
+    // TODO: are we even going to deal with the error?
+    if (file.fail()) return nullptr;
 
+    // TODO: we shouldnt be using vec
     std::vector<Vec3> v;
     std::vector<Vec2> vt;
     std::vector<Vec3> vn;
 
     std::vector<Vec3> vertices;
     std::vector<Vec2> uvs;
-    std::vector<Vec3> normals;
+    std::vector<Basis> bases;
 
     std::vector<IVec3> indices;
 
@@ -89,10 +89,6 @@ MeshData * load_obj(const std::string & filename) {
         std::getline(file, line);
 
         switch (line[0]) {
-        case '#':
-            // # [...]
-            break;
-
         case 'v':
             // v x y z [w]
             // vt u [v] [w]
@@ -121,7 +117,7 @@ MeshData * load_obj(const std::string & filename) {
             if (section != 'f') {
                 vertices.resize(v.size());
                 uvs.resize(v.size());
-                normals.resize(v.size());
+                bases.resize(v.size());
                 section = 'f';
             }
 
@@ -136,11 +132,11 @@ MeshData * load_obj(const std::string & filename) {
             }
 
             if (vn.size() > 0) {
-                normals[face.x] = vn[normal.x];
-                normals[face.y] = vn[normal.y];
-                normals[face.z] = vn[normal.z];
+                bases[face.x].normal = vn[normal.x];
+                bases[face.y].normal = vn[normal.y];
+                bases[face.z].normal = vn[normal.z];
             } else {
-                normals.push_back(Vec3());
+                bases.push_back(Basis());
             }
 
             indices.push_back(IVec3(face.x, face.y, face.z));
@@ -152,7 +148,14 @@ MeshData * load_obj(const std::string & filename) {
         }
     }
 
-    return new MeshData(v, uvs, normals, indices);
+    MeshData * result = new MeshData(v.size(), indices.size());
+
+    result->set_vertices(v.data());
+    result->set_uvs(uvs.data());
+    result->set_bases(bases.data());
+    result->set_indices(indices.data());
+
+    return result;
 }
 
 }

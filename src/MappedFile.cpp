@@ -1,7 +1,7 @@
 #include "MappedFile.hpp"
 
 #include <fcntl.h>
-#include <stdexcept>
+#include <iostream>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -10,12 +10,12 @@ namespace method {
 
 void MappedFile::close_file() {
     if (close(this->file) == -1)
-        throw std::runtime_error("File could not be closed");
+        std::cout << "File could not be closed" << std::endl;
 }
 
 void MappedFile::clean_throw(std::string message) {
     this->close_file();
-    throw std::runtime_error(message);
+    std::cout << message << std::endl;
 }
 
 void MappedFile::map_file() {
