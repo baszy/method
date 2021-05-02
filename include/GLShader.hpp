@@ -7,6 +7,8 @@
 #include "Matrix.hpp"
 #include "Vector.hpp"
 
+#define METHOD_GLSL(str) (const char*)"#version 450 core\n" #str
+
 namespace method {
 
 enum ShaderType {
@@ -37,13 +39,17 @@ public:
 
     void compile();
     void load(std::string path, ShaderType type);
+    void set_source(const char * source, ShaderType type);
+    void use() const;
+
     void set_uniform(const std::string & location, int value);
     void set_uniform(const std::string & location, float value);
     void set_uniform(const std::string & location, const Vec2 & value);
     void set_uniform(const std::string & location, const Vec3 & value);
     void set_uniform(const std::string & location, const Vec4 & value);
-    void set_uniform(const std::string & location, const mat4 & value);
-    void use() const;
+    void set_uniform(const std::string & location, const Mat4 & value);
+    void set_uniform(const std::string & location,
+                     const Vec3 values[], unsigned int values_length);
 
 };
 

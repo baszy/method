@@ -10,6 +10,7 @@ public:
     bool running;
     Vec3 direction_axis;
     IVec2 mouse_axis;
+    bool test_axis;
     
     Controller();
 

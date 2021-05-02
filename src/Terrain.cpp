@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <vector>
 
 #include "Vector.hpp"
 
@@ -19,7 +20,7 @@ MeshData * new_terrain(int power, float width, float height) {
 
     std::vector<Vec3> points;
     std::vector<Vec2> uvs;
-    std::vector<Vec3> normals;
+    std::vector<Basis> bases;
     std::vector<IVec3> indices;
 
     for (int i = 0; i < npoints * npoints; i++) {
@@ -31,9 +32,9 @@ MeshData * new_terrain(int power, float width, float height) {
         //uvs.push_back(Vec2((float)(i % npoints) / size,
         //    (float)(i / npoints) / size));
         uvs.push_back(Vec2((float)(i % npoints), (float)(i / npoints)));
-        normals.push_back(Vec3(0.0f, 1.0f, 0.0f));
+        bases.push_back({Vec3(1.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 1.0f, 0.0f)});
     }
-	
+
     for (unsigned int i = 0; i < size * size + size - 1; i++) {
         if ((i + 1) % npoints == 0) i++;
 
@@ -46,7 +47,14 @@ MeshData * new_terrain(int power, float width, float height) {
 	    }
     }
 
-    return new MeshData(points, uvs, normals, indices);
+    MeshData * result = new MeshData(points.size(), indices.size());
+
+    result->set_vertices(points.data());
+    result->set_uvs(uvs.data());
+    result->set_bases(bases.data());
+    result->set_indices(indices.data());
+
+    return result;
 }
 
 }

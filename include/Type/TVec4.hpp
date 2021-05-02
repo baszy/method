@@ -76,11 +76,11 @@ template <typename Type>
 TVec4<Type> normalize(const TVec4<Type> & source) {
     TVec4<Type> result;
 
-    Type m = magnitude(source);
-    result.x = source.x / m;
-    result.y = source.y / m;
-    result.z = source.z / m;
-    result.w = source.w / m;
+    Type m = 1 / magnitude(source);
+    result.x = source.x * m;
+    result.y = source.y * m;
+    result.z = source.z * m;
+    result.w = source.w * m;
 
     return result;
 }

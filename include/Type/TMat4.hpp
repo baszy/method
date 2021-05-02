@@ -13,7 +13,7 @@ public:
     Type m[4][4];
 
     TMat4() {
-        std::memset(this->m, 0, 16 * sizeof(Type));
+        std::memset(this->m, 0, 4 * 4 * sizeof(Type));
         this->m[0][0] = 1;
         this->m[1][1] = 1;
         this->m[2][2] = 1;
@@ -21,16 +21,16 @@ public:
     }
 
     TMat4(Type elements[4][4]) {
-        std::memcpy(this->m, elements, 16 * sizeof(Type));
+        std::memcpy(this->m, elements, 4 * 4 * sizeof(Type));
     }
 
     TMat4(const TMat4<Type> & other) {
-        std::memcpy(this->m, other.m, 16 * sizeof(Type));
+        std::memcpy(this->m, other.m, 4 * 4 * sizeof(Type));
     }
 
     TMat4<Type> & operator = (const TMat4<Type> & other) {
         if (this != &other) {
-            std::memcpy(this->m, other.m, 16 * sizeof(Type));
+            std::memcpy(this->m, other.m, 4 * 4 * sizeof(Type));
         }
 
         return * this;

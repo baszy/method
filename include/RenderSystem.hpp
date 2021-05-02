@@ -1,27 +1,35 @@
 #pragma once
 
-#include <string>
+#include "glad/glad.h"
 
-#include "RenderTarget.hpp"
-#include "Scene.hpp"
+#include "Framebuffer.hpp"
 #include "GLShader.hpp"
+#include "MeshManager.hpp"
+#include "TextureManager.hpp"
+#include "Scene.hpp"
 
 namespace method {
 
 class RenderSystem {
-protected:
-    RenderTarget * m_target;
-
 public:
-    RenderSystem(RenderTarget * target);
-    ~RenderSystem();
+    Framebuffer * render_target;
+    Framebuffer sky_target;
 
-    void begin();
+    MeshManager * mesh_manager;
+    TextureManager * texture_manager;
+
+    GLShader sky_shader;
+    GLShader quad_shader;
+    GLShader axes_shader;
+    GLuint sky_vao;
+    GLuint quad_vao;
+    GLuint axes_vao;
+
+    GLTexture * noise;
+
+    RenderSystem(Framebuffer & target, MeshManager & mm, TextureManager & tm);
+
     void draw(const Scene & scene);
-    void end();
-    std::string get_info() const;
-    RenderTarget * get_render_target();
-
 };
 
 }

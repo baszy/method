@@ -57,7 +57,7 @@ void GLAPIENTRY gl_debug_callback(GLenum source, GLenum type, GLuint id,
     }
 
     // TOOD: use std::fprintf()
-    std::printf("[OPENGL][%s][%s] %s\n", str_type.c_str(),
+    std::printf("[GL][%s][%s] %s\n", str_type.c_str(),
         str_severity.c_str(), message);
 }
 

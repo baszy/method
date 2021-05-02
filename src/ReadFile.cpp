@@ -1,7 +1,7 @@
 #include "ReadFile.hpp"
 
 #include <fstream>
-#include <stdexcept>
+#include <iostream>
 
 namespace method {
 
@@ -22,7 +22,7 @@ std::string ReadFile(std::string filename) {
     }
 
     // TODO: instead of throwing exception, deal with error locally
-    throw std::runtime_error("File \"" + filename + "\" could not be opened");
+    std::cout << "File \"" << filename << "\" could not be opened" << std::endl;
 }
 
 }

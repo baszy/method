@@ -3,7 +3,7 @@
 namespace method {
 
 void Entity::recalculate() {
-    m_model = scale(m_scale) * rotate(m_axis, m_angle) * translate(m_position);
+    m_model = translate(m_position) * scale(m_scale) * rotate(m_axis, m_angle);
 }
 
 Entity::Entity()
@@ -12,7 +12,7 @@ Entity::Entity()
     , m_angle(0.0f)
     , m_scale(1.0f, 1.0f, 1.0f) {}
 
-mat4 Entity::get_model_matrix() const {
+Mat4 Entity::get_model_matrix() const {
     return m_model;
 }
 

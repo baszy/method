@@ -11,3 +11,4 @@ docs/
 # Text editor turds
 *~
 *.swp
+*.vim
