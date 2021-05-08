@@ -13,9 +13,11 @@ public:
     TVec2()
         : TVec2(0, 0) {}
 
+    TVec2(Type all)
+        : TVec2(all, all) {}
+
     TVec2(Type x, Type y)
         : x(x), y(y) {}
-
 };
 
 template <typename Type>

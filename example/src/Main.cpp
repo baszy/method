@@ -32,6 +32,7 @@ int main() {
     Window window("method_example", IVec2(1920, 1080));
     window.set_swap_mode(SwapMode::VSYNC);
     window.set_fullscreen(true);
+    window.grab_cursor(true);
 
     Framebuffer framebuffer(IVec2(1920, 1080), false);
 
@@ -39,7 +40,6 @@ int main() {
     TextureManager tex_manager = TextureManager("example/img/");
 
     Controller input = Controller();
-    input.grab_cursor(true);
 
     GLShader shader = GLShader();
     shader.load("shader/blinn.vert", ShaderType::VERTEX);
@@ -91,8 +91,8 @@ int main() {
                            .color = Vec3(1.0f, 1.0f, 1.0f) };
     scene.set_sun(sun);
 
-    Prop sponza = Prop(mesh_manager.index_of("sponza.obj"), moss_brick);
-    scene.props.push_back(&sponza);
+    Prop plane = Prop(mesh_manager.index_of("plane.obj"), moss_brick);
+    scene.props.push_back(&plane);
 
     // 2 units per second
     float speed = 2.0f;
@@ -112,8 +112,8 @@ int main() {
 
         input.update();
 
-        angles = angles + Vec2(radians(input.mouse_axis.x * 0.05f),
-                               radians(-input.mouse_axis.y * 0.05f));
+        angles = angles + Vec2(radians(input.mouse.x * 0.05f),
+                               radians(-input.mouse.y * 0.05f));
         angles.y = clamp(angles.y, -M_PI_2 + 0.01, M_PI_2 - 0.01);
 
         // Speed * time = distance :)
@@ -130,7 +130,7 @@ int main() {
          *     Vec3(-4.0f + sin(    M_PI   + runtime), 1.5f, -4.0f + cos(    M_PI   + runtime));
          */
 
-        scene.sun.direction = Vec3(sin(runtime / 6.0f), sin(runtime / 6.0f), cos(runtime / 6.0f));
+        scene.sun.direction = Vec3(sin(runtime / 240.0f), sin(runtime / 240.0f), cos(runtime / 240.0f));
 
         Vec3 front(cos(angles.x), 0, sin(angles.x));
         Vec3 look(front.x * cos(angles.y),
@@ -139,12 +139,12 @@ int main() {
         Vec3 up = Vec3(0.0f, 1.0f, 0.0f);
         Vec3 side = normalize(cross(front, up));
 
-        if (input.direction_axis.x > 0) pos = pos + distance * side;
-        else if (input.direction_axis.x < 0) pos = pos - distance * side;
-        if (input.direction_axis.y > 0) pos = pos + distance * up;
-        else if (input.direction_axis.y < 0) pos = pos - distance * up;
-        if (input.direction_axis.z > 0) pos = pos - distance * front;
-        else if (input.direction_axis.z < 0) pos = pos + distance * front;
+        if (input.direction_1.x > 0) pos = pos + distance * side;
+        else if (input.direction_1.x < 0) pos = pos - distance * side;
+        if (input.direction_1.y > 0) pos = pos + distance * up;
+        else if (input.direction_1.y < 0) pos = pos - distance * up;
+        if (input.direction_1.z > 0) pos = pos - distance * front;
+        else if (input.direction_1.z < 0) pos = pos + distance * front;
 
         camera.set_position(pos);
         camera.set_look(pos + look);

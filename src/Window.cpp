@@ -40,26 +40,9 @@ const char * fragment_source = METHOD_GLSL(
 
     out vec4 frag_color;
 
-    const float o = 1.0f / 100.0f;
-    float kernel[9] = float[](
-        1.0 / 9, 1.0 / 9, 1.0 / 9,
-        1.0 / 9, 1.0 / 9, 1.0 / 9,
-        1.0 / 9, 1.0 / 9, 1.0 / 9
-    );
-
     void main()
     {
-        vec3 col = texture(frame, texture_coord).rgb;
-
-        /*
-        for (int i = 0; i < 1; i++)
-            for (int y = -1; y <= 1; y++)
-                for (int x = -1; x <= 1; x++)
-                    col += kernel[(x + 1) + (y + 1) * 3]
-                           * texture(frame, texture_coord + vec2(x * o, y * o)).rgb;
-        */
-
-        frag_color = vec4(col, 1.0);
+        frag_color = vec4(texture(frame, texture_coord), 1.0);
     }
 );
 
@@ -164,6 +147,10 @@ IVec2 Window::get_viewport() {
     return result;
 }
 
+void Window::grab_cursor(bool enable) {
+    SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);
+}
+
 void Window::set_fullscreen(bool enable) {
     SDL_SetWindowFullscreen(m_sdl_window, enable ? SDL_WINDOW_FULLSCREEN : 0);
 }
@@ -183,7 +170,4 @@ void Window::set_swap_mode(SwapMode mode) {
 void Window::swap() {
     SDL_GL_SwapWindow(m_sdl_window);
 }
-
-void Window::use() {}
-
 }

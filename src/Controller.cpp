@@ -4,34 +4,60 @@
 
 namespace method {
 
-Controller::Controller() : running(true),
-                           direction_axis(Vec3(0.0f, 0.0f, 0.0f)),
-                           mouse_axis(IVec2(0, 0)) {}
-
-void Controller::grab_cursor(bool enable) {
-    SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);
-}
+// The rest should be default constructed...
+Controller::Controller() : running(true) {}
 
 void Controller::update() {
-    direction_axis = Vec3(0.0f, 0.0f, 0.0f);
-    mouse_axis = IVec2(0, 0);
+    // TODO: This is kind of ugly
+    direction_1 = Vec3(0);
+    direction_2 = Vec3(0);
+    mouse = IVec2(0);
+    mousewheel = IVec2(0);
 
     const uint8_t * keystate = SDL_GetKeyboardState(NULL);
-    this->running = (keystate[SDL_SCANCODE_ESCAPE]) ? false : true;
-    this->test_axis = (keystate[SDL_SCANCODE_R]) ? false : true;
-    this->direction_axis.z = (keystate[SDL_SCANCODE_W]) ? -1 : this->direction_axis.z;
-    this->direction_axis.z = (keystate[SDL_SCANCODE_S]) ? 1 : this->direction_axis.z;
-    this->direction_axis.y = (keystate[SDL_SCANCODE_LSHIFT]) ? -1 : this->direction_axis.y;
-    this->direction_axis.y = (keystate[SDL_SCANCODE_SPACE]) ? 1 : this->direction_axis.y;
-    this->direction_axis.x = (keystate[SDL_SCANCODE_A]) ? -1 : this->direction_axis.x;
-    this->direction_axis.x = (keystate[SDL_SCANCODE_D]) ? 1 : this->direction_axis.x;
+
+    running = (keystate[SDL_SCANCODE_ESCAPE]) ? false : true;
+
+    if (keystate[SDL_SCANCODE_S]) direction_1.z = 1;
+    else if (keystate[SDL_SCANCODE_W]) direction_1.z = -1;
+    if (keystate[SDL_SCANCODE_SPACE]) direction_1.y = 1;
+    else if (keystate[SDL_SCANCODE_LSHIFT]) direction_1.y = -1;
+    if (keystate[SDL_SCANCODE_D]) direction_1.x = 1;
+    else if (keystate[SDL_SCANCODE_A]) direction_1.x = -1;
+
+    if (keystate[SDL_SCANCODE_DOWN]) direction_2.z = 1;
+    else if (keystate[SDL_SCANCODE_UP]) direction_2.z = -1;
+    if (keystate[SDL_SCANCODE_RCTRL]) direction_2.y = 1;
+    else if (keystate[SDL_SCANCODE_RSHIFT]) direction_2.y = -1;
+    if (keystate[SDL_SCANCODE_RIGHT]) direction_2.x = 1;
+    else if (keystate[SDL_SCANCODE_LEFT]) direction_2.x = -1;
 
     SDL_Event event;
     while (SDL_PollEvent(&event) != 0) {
         switch (event.type) {
         case SDL_MOUSEMOTION:
-            this->mouse_axis.x += event.motion.xrel;
-            this->mouse_axis.y += event.motion.yrel;
+            mouse.x += event.motion.xrel;
+            mouse.y += event.motion.yrel;
+            break;
+        case SDL_MOUSEWHEEL:
+            mousewheel.x = event.wheel.x;
+            mousewheel.y = event.wheel.y;
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            if (event.button.button == SDL_BUTTON_LEFT)
+                mousebutton.x = 1;
+            else if (event.button.button == SDL_BUTTON_MIDDLE)
+                mousebutton.y = 1;
+            else if (event.button.button == SDL_BUTTON_RIGHT)
+                mousebutton.z = 1;
+            break;
+        case SDL_MOUSEBUTTONUP:
+            if (event.button.button == SDL_BUTTON_LEFT)
+                mousebutton.x = 0;
+            else if (event.button.button == SDL_BUTTON_MIDDLE)
+                mousebutton.y = 0;
+            else if (event.button.button == SDL_BUTTON_RIGHT)
+                mousebutton.z = 0;
             break;
         default:
             break;
