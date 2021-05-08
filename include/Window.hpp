@@ -38,13 +38,12 @@ public:
     void draw_framebuffer(const Framebuffer & framebuffer);
     IVec2 get_dimensions() const;
     IVec2 get_viewport();
+    void grab_cursor(bool enable);
     void set_fullscreen(bool enable);
     void set_position(IVec2 position);
     void set_resizeable(bool enable);
     void set_swap_mode(SwapMode mode);
     void swap();
-    void use();
-
 };
 
 }
