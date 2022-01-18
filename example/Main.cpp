@@ -33,7 +33,7 @@ int main(int argc, char * argv[]) {
     // Create the window + renderer
     ///////////////////////////////////////////////////////////////////////////
 
-    Window window("method_example", IVec2(1920, 1080));
+    Window window("method_example", IVec2(1280, 720));
     window.set_swap_mode(SwapMode::IMMEDIATE);
     window.set_fullscreen(false);
     window.grab_cursor(true);

@@ -1,21 +1,26 @@
 # method
-Experimental C++11 OpenGL 3D rendering engine. May be extended in the future 
-to have more features specific to game programming. Note that the engine is
-only Linux compatible at the moment.
+Experimental OpenGL 3D rendering engine. Only Linux-compatible at the moment.
 
-![The Stanford Dragon](https://raw.githubusercontent.com/baszy/method/master/screenshots/dragon.png)
+![Dabrovic Sponza](https://media.githubusercontent.com/media/baszy/method/master/screenshots/sponza.png)
 
 ## Features
 - Blinn-Phong shading model + normal, specular mapping
 - Uncompressed TGA texture loading
-- OBJ model loading with shared-vertex optimization for OpenGL
+- OBJ model loading with smooth groups / shared-vertex optimization for OpenGL
 
 ## Building
-Move to the desired build directory (in-source builds are not recommended) and
-invoke CMake:
+Move to the desired build directory and invoke CMake (in-source builds are not
+recommended):
 ```
 mkdir build
 cd build
 cmake ./path/to/CMakeLists.txt
 ```
 The main library and test program can then be built by running `make`.
+
+## Running the example program
+```
+./build/method_example
+```
+Use W, A, S, D, Shift, Space to fly around the scene. The angle of the sun can
+be changed with the scrollwheel.
