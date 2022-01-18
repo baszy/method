@@ -1,36 +1,39 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 #include "glad/glad.h"
 
-#include "Hotloader.hpp"
 #include "MeshData.hpp"
 
 namespace method {
 
-struct GLVAO {
-    GLuint vao_id;
-    GLuint num_vbos;
-    GLuint num_indices;
+class Mesh {
+public:
+    GLuint vao;
+    GLuint * vbo;
+    GLuint vbo_count;
+    GLuint ebo;
+    MeshData * data;
 };
 
-class MeshManager : public Hotloader {
+class MeshManager {
 private:
-    std::vector<MeshData *> mesh_datas;
-    std::vector<GLVAO *> mesh_vaos;
-
-    std::string path_base;
-
-    void reload(HotloaderIndex handle);
+    std::string base_path;
+    std::unordered_map<std::string, Mesh> meshes;
 
 public:
-    MeshManager(const std::string & path);
+    MeshManager(const std::string & base_path);
     ~MeshManager();
 
-    const GLVAO * get(HotloaderIndex handle);
-    bool is_loaded(HotloaderIndex handle) const;
+    MeshManager(const MeshManager & other)               = delete;
+    MeshManager(MeshManager && other)                    = delete;
+    MeshManager & operator = (const MeshManager & other) = delete;
+    MeshManager & operator = (MeshManager && other)      = delete;
+
+    void reload(std::string handle);
+    const Mesh & get(const std::string & handle);
 };
 
 }

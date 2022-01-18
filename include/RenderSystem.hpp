@@ -3,33 +3,43 @@
 #include "glad/glad.h"
 
 #include "Framebuffer.hpp"
-#include "GLShader.hpp"
+#include "Shader.hpp"
 #include "MeshManager.hpp"
-#include "TextureManager.hpp"
 #include "Scene.hpp"
+#include "TextureManager.hpp"
 
 namespace method {
 
+const int DEBUG_MAX_LINES = 100;
+
 class RenderSystem {
 public:
-    Framebuffer * render_target;
-    Framebuffer sky_target;
-
     MeshManager * mesh_manager;
     TextureManager * texture_manager;
 
-    GLShader sky_shader;
-    GLShader quad_shader;
-    GLShader axes_shader;
-    GLuint sky_vao;
-    GLuint quad_vao;
-    GLuint axes_vao;
+    Shader cubemap_shader;
+    GLuint cubemap_vao;
 
-    GLTexture * noise;
+    Vec3 * debug_vertices;
+    int debug_lines;
+    Shader debug_shader;
+    GLuint debug_vao;
+    GLuint debug_vbo;
 
-    RenderSystem(Framebuffer & target, MeshManager & mm, TextureManager & tm);
+    Shader frustum_shader;
+    GLuint frustum_vao;
 
-    void draw(const Scene & scene);
+    Framebuffer shadow_fb;
+    Mat4 shadow_projection;
+    Shader shadow_shader;
+
+    RenderSystem(MeshManager & mm, TextureManager & tm);
+    ~RenderSystem();
+
+    void draw(Framebuffer * fb, const Scene & scene);
+    void debug_ray(Vec3 start, Vec3 end, Vec3 color);
+
+    void print_gl_info() const;
 };
 
 }

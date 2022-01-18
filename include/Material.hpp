@@ -1,22 +1,25 @@
 #pragma once
 
-#include "GLShader.hpp"
+#include <string>
+
+#include "Shader.hpp"
 #include "TextureManager.hpp"
 #include "Vector.hpp"
 
 namespace method {
 
-struct Material {
-    GLShader * shader;
+class Material {
+public:
+    Shader * shader = nullptr;
 
-    Vec3 ambient_color = Vec3(0.0f, 0.0f, 0.0f);
-    Vec3 diffuse_color = Vec3(0.0f, 0.0f, 0.0f);
-    Vec3 specular_color = Vec3(0.0f, 0.0f, 0.0f);
-    float specular_exponent;
+    float specular_exponent = 32;
+    std::string diffuse_handle;
+    std::string normal_handle;
+    std::string specular_handle;
 
-    HotloaderIndex diffuse_map_handle;
-    HotloaderIndex normal_map_handle;
-    HotloaderIndex displacement_map_handle;
+    Material(std::string diffuse_handle,
+             std::string normal_handle,
+             std::string specular_handle);
 };
 
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Type/TMat2.hpp"
 #include "Type/TMat3.hpp"
 #include "Type/TMat4.hpp"

@@ -4,7 +4,7 @@
 
 #include "glad/glad.h"
 
-#include "GLDebugCallback.hpp"
+#include "GlDebugCallback.hpp"
 
 namespace method {
 
@@ -21,28 +21,26 @@ Vec2 quad_uvs[6] = {
 };
 
 const char * vertex_source = METHOD_GLSL(
-    layout (location = 0) in vec2 position;
+    layout (location = 0) in vec3 position;
     layout (location = 1) in vec2 uv;
 
     out vec2 texture_coord;
 
-    void main()
-    {
+    void main() {
         texture_coord = uv;
-        gl_Position = vec4(position.x, position.y, 0.0, 1.0);
+        gl_Position = vec4(position, 1.0);
     }
 );
 
 const char * fragment_source = METHOD_GLSL(
     in vec2 texture_coord;
 
-    uniform sampler2D frame;
+    uniform sampler2D fb1;
 
     out vec4 frag_color;
 
-    void main()
-    {
-        frag_color = vec4(texture(frame, texture_coord), 1.0);
+    void main() {
+        frag_color = vec4(texture(fb1, texture_coord).rgb, 1.0);
     }
 );
 
@@ -52,8 +50,8 @@ Window::Window()
     : Window(METHOD_DEFAULT_WINDOW_TITLE, IVec2(640, 480)) {}
 
 Window::Window(const std::string & title, const IVec2 & dimensions)
-    : m_dimensions(dimensions)
-    , post_shader() {
+    : m_dimensions(dimensions),
+      post_shader() {
 
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
         std::cout << "SDL_InitSubSystem failed with subsystems: "
@@ -118,23 +116,7 @@ Window::Window(const std::string & title, const IVec2 & dimensions)
 Window::~Window() {
     SDL_GL_DeleteContext(m_sdl_glcontext);
     SDL_DestroyWindow(m_sdl_window);
-    SDL_Quit();
-}
-
-void Window::draw_framebuffer(const Framebuffer & framebuffer) {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDisable(GL_DEPTH_TEST);
-    glClearColor(0, 0, 0, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    post_shader.use();
-
-    post_shader.set_uniform("frame", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, framebuffer.color_buffer_id);
-
-    glBindVertexArray(screen_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
 IVec2 Window::get_dimensions() const {
@@ -149,6 +131,26 @@ IVec2 Window::get_viewport() {
 
 void Window::grab_cursor(bool enable) {
     SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);
+}
+
+void Window::present(const Framebuffer & fb1) {
+    glDisable(GL_DEPTH_TEST);
+
+    // TODO: Should the default framebuffer be in a Framebuffer object?
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, m_dimensions.x, m_dimensions.y);
+
+    glClearColor(0, 0, 0, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    post_shader.use();
+
+    post_shader.set_uniform("fb1", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, fb1.color_buffer_id);
+
+    glBindVertexArray(screen_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Window::set_fullscreen(bool enable) {

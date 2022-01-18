@@ -13,7 +13,7 @@ public:
     TVec2()
         : TVec2(0, 0) {}
 
-    TVec2(Type all)
+    explicit TVec2(Type all)
         : TVec2(all, all) {}
 
     TVec2(Type x, Type y)
@@ -80,5 +80,11 @@ template <typename Type>
 Type dot(const TVec2<Type> & lhs, const TVec2<Type> & rhs) {
     return (lhs.x * rhs.x) + (lhs.y * rhs.y);
 }
+
+// Template specializations
+
+bool operator == (const TVec2<bool> & lhs, const TVec2<bool> & rhs);
+bool operator == (const TVec2<int> & lhs, const TVec2<int> & rhs);
+bool operator == (const TVec2<unsigned int> & lhs, const TVec2<unsigned int> & rhs);
 
 }

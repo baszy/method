@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "File.hpp"
+
 namespace method {
 
 enum MappedFileMode {
@@ -9,23 +11,19 @@ enum MappedFileMode {
     READ_WRITE
 };
 
-class MappedFile {
-public:
+class MappedFile : public File {
+private:
     int file;
 
-    char * data;
-    unsigned int data_length;
+    size_t data_length;
+    void * data;
 
-    void close_file();
-    void clean_throw(std::string message);
-    void map_file();
-    void open_file(std::string filename, MappedFileMode mode);
-    void unmap_file();
-
-    MappedFile();
-    MappedFile(std::string filename, MappedFileMode mode);
+public:
+    MappedFile(std::string path, MappedFileMode mode);
     ~MappedFile();
 
+    const void * get_data() const;
+    size_t get_size() const;
 };
 
 }

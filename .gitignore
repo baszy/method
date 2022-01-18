@@ -1,12 +1,15 @@
 # Compiled binaries
 bin/
 build/
-docs/
 
 # Build remnants
 *.o
 *.a
 *.so
+
+# Perf turds
+perf.*
+out.*
 
 # Text editor turds
 *~

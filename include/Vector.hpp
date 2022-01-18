@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Type/TVec2.hpp"
 #include "Type/TVec3.hpp"
 #include "Type/TVec4.hpp"

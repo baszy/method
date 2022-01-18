@@ -1,13 +1,17 @@
 #include "Scene.hpp"
 
+using namespace std;
+
 namespace method {
 
-Prop::Prop(HotloaderIndex mesh, const Material & material)
-    : mesh_handle(mesh)
-    , material(&material) {}
+Prop::Prop(string mesh, const Material & material)
+    : mesh(mesh),
+      material(material) {}
 
-Scene::Scene()
-    : point_lights_length(0) {}
+Scene::Scene(const Camera & c, const Sky & s)
+    : camera(&c),
+      sky(&s),
+      point_lights_length(0) {}
 
 void Scene::add_point_light(const PointLight & light) {
     if (point_lights_length < METHOD_MAX_POINT_LIGHTS) {
@@ -17,9 +21,10 @@ void Scene::add_point_light(const PointLight & light) {
     }
 }
 
-void Scene::set_sun(const DirectionLight & light) {
-    sun.direction = light.direction;
-    sun.color = light.color;
+Vec3 * Scene::get_aabb() const {
+    Vec3 * result = new Vec3[8];
+
+    return result;
 }
 
 }

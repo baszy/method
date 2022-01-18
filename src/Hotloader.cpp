@@ -1,12 +1,15 @@
 #include "Hotloader.hpp"
 
+#include <iostream>
+using namespace std;
+
 namespace method {
 
 HotloaderIndex Hotloader::index_of(const Source & path) {
     // First we linearly search for the string and return it
-    for (int i = 0; i < sources.size(); i++) {
-        if (sources[i] == path) return i;
-    }
+    for (int i = 0; i < sources.size(); i++)
+        if (sources[i] == path)
+            return i;
 
     // If we dont find it, we just append it
     sources.push_back(path);

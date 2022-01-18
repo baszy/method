@@ -4,9 +4,11 @@
 #include <cstring>
 
 #include "Type/TVec3.hpp"
+#include "Type/TVec4.hpp"
 
 namespace method {
 
+// TODO: optimization, parameter checking
 template <typename Type>
 class TMat4 {
 public:
@@ -39,34 +41,81 @@ public:
     const Type * get_data() const {
         return &this->m[0][0];
     }
-
 };
 
 template <typename Type>
-TMat4<Type> operator * (const TMat4<Type> & lhs, const TMat4<Type> & rhs) {
-    TMat4<Type> result;
-
-    // TODO: Ripe for optimization
-    for (int x = 0; x < 4; x++) {
-        for (int y = 0; y < 4; y++) {
-            Type dot = 0;
-            for (int k = 0; k < 4; k++) {
-                dot += (rhs.m[x][k] * lhs.m[k][y]);
-            }
-            result.m[x][y] = dot;
-        }
-    }
+TMat3<Type> cofactor(const TMat4<Type> & source, int i, int j) {
+    TMat3<Type> result;
 
     return result;
 }
 
 template <typename Type>
-TMat4<Type> translate(const TVec3<Type> & translation) {
+Type determinant(const TMat4<Type> & source) {
+    return 1;
+}
+
+template <typename Type>
+TMat4<Type> invert(const TMat4<Type> & source) {
+    // TODO: implement
+}
+
+template <typename Type>
+TMat4<Type> look_at(TVec3<Type> position, TVec3<Type> at, TVec3<Type> up) {
     TMat4<Type> result;
 
-    result.m[3][0] = translation.x;
-    result.m[3][1] = translation.y;
-    result.m[3][2] = translation.z;
+    TVec3<Type> front = normalize(at - position);
+    TVec3<Type> side = normalize(cross(front, normalize(up)));
+    TVec3<Type> vertical = normalize(cross(side, front));
+
+    result.m[0][0] = side.x;
+    result.m[1][0] = side.y;
+    result.m[2][0] = side.z;
+
+    result.m[0][1] = vertical.x;
+    result.m[1][1] = vertical.y;
+    result.m[2][1] = vertical.z;
+
+    result.m[0][2] = -front.x;
+    result.m[1][2] = -front.y;
+    result.m[2][2] = -front.z;
+
+    result.m[3][0] = -dot(side, position);
+    result.m[3][1] = -dot(vertical, position);
+    result.m[3][2] =  dot(front, position);
+
+    return result;
+}
+
+template <typename Type>
+TMat4<Type> orthographic(Type left, Type right, Type bottom, Type top,
+    Type near, Type far) {
+
+    TMat4<Type> result;
+
+    result.m[0][0] = 2 / (right - left);
+    result.m[1][1] = 2 / (top - bottom);
+    result.m[2][2] = -2 / (far - near);
+
+    result.m[3][0] = -(right + left) / (right - left);
+    result.m[3][1] = -(top + bottom) / (top - bottom);
+    result.m[3][2] = -(far + near) / (far - near);
+
+    return result;
+}
+
+template <typename Type>
+TMat4<Type> perspective(Type fov, Type aspect, Type near, Type far) {
+    TMat4<Type> result;
+
+    Type h = tan(fov / 2);
+
+    result.m[0][0] = 1 / (aspect * h);
+    result.m[1][1] = 1 / h;
+    result.m[2][2] = -(far + near) / (far - near);
+    result.m[2][3] = -1;
+    result.m[3][2] = -(2 * far * near) / (far - near);
+    result.m[3][3] = 0;
 
     return result;
 }
@@ -84,17 +133,14 @@ TMat4<Type> rotate(TVec3<Type> axis, Type angle) {
     result.m[0][0] = axis.x * axis.x * omc + cosa;
     result.m[1][0] = axis.x * axis.y * omc - axis.z * sina;
     result.m[2][0] = axis.x * axis.z * omc + axis.y * sina;
-    result.m[3][0] = 0;
 
     result.m[0][1] = axis.y * axis.x * omc + axis.z * sina;
     result.m[1][1] = axis.y * axis.y * omc + cosa;
     result.m[2][1] = axis.y * axis.z * omc - axis.x * sina;
-    result.m[3][1] = 0;
 
     result.m[0][2] = axis.z * axis.x * omc - axis.y * sina;
     result.m[1][2] = axis.z * axis.y * omc + axis.x * sina;
     result.m[2][2] = axis.z * axis.z * omc + cosa;
-    result.m[3][2] = 0;
 
     return result;
 }
@@ -111,8 +157,14 @@ TMat4<Type> scale(const TVec3<Type> & scale) {
 }
 
 template <typename Type>
-TMat4<Type> invert(const TMat4<Type> & source) {
-    // TODO: implement
+TMat4<Type> translate(const TVec3<Type> & translation) {
+    TMat4<Type> result;
+
+    result.m[3][0] = translation.x;
+    result.m[3][1] = translation.y;
+    result.m[3][2] = translation.z;
+
+    return result;
 }
 
 template <typename Type>
@@ -143,64 +195,30 @@ TMat4<Type> transpose(const TMat4<Type> & source) {
 }
 
 template <typename Type>
-TMat4<Type> look_at(TVec3<Type> position, TVec3<Type> at, TVec3<Type> up) {
+TMat4<Type> operator * (const TMat4<Type> & lhs, const TMat4<Type> & rhs) {
     TMat4<Type> result;
 
-    TVec3<Type> forward = normalize(at - position);
-    TVec3<Type> side = normalize(cross(forward, normalize(up)));
-    TVec3<Type> vertical = normalize(cross(side, forward));
-
-    result.m[0][0] = side.x;
-    result.m[1][0] = side.y;
-    result.m[2][0] = side.z;
-
-    result.m[0][1] = vertical.x;
-    result.m[1][1] = vertical.y;
-    result.m[2][1] = vertical.z;
-
-    result.m[0][2] = -forward.x;
-    result.m[1][2] = -forward.y;
-    result.m[2][2] = -forward.z;
-
-    result.m[3][0] = -dot(side, position);
-    result.m[3][1] = -dot(vertical, position);
-    result.m[3][2] = dot(forward, position);
-
-    // Too slow
-    // return result * translate(-position);
+    for (int x = 0; x < 4; x++) {
+        for (int y = 0; y < 4; y++) {
+            Type dot = 0;
+            for (int k = 0; k < 4; k++) {
+                dot += (rhs.m[x][k] * lhs.m[k][y]);
+            }
+            result.m[x][y] = dot;
+        }
+    }
 
     return result;
 }
 
 template <typename Type>
-TMat4<Type> orthographic(Type left, Type right, Type top, Type bottom,
-    Type near, Type far) {
+TVec4<Type> operator * (const TMat4<Type> & lhs, const TVec4<Type> & rhs) {
+    TVec4<Type> result;
 
-    TMat4<Type> result;
-
-    result.m[0][0] = 2 / (right - left);
-    result.m[1][1] = 2 / (top - bottom);
-    result.m[2][2] = 2 / (near - far);
-
-    result.m[3][0] = (left + right) / (left - right);
-    result.m[3][1] = (bottom + top) / (bottom - top);
-    result.m[3][2] = (far + near) / (near - far);
-
-    return result;
-}
-
-template <typename Type>
-TMat4<Type> perspective(Type fov, Type aspect, Type near, Type far) {
-    TMat4<Type> result;
-
-    Type h = tan(fov / 2);
-
-    result.m[0][0] = 1 / (aspect * h);
-    result.m[1][1] = 1 / h;
-    result.m[2][2] = -(far + near) / (far - near);
-    result.m[2][3] = -1;
-    result.m[3][2] = -(2 * far * near) / (far - near);
-    result.m[3][3] = 0;
+    result.x = lhs.m[0][0] * rhs.x + lhs.m[0][1] * rhs.y + lhs.m[0][2] * rhs.z + lhs.m[0][3] * rhs.w;
+    result.y = lhs.m[1][0] * rhs.x + lhs.m[1][1] * rhs.y + lhs.m[1][2] * rhs.z + lhs.m[1][3] * rhs.w;
+    result.z = lhs.m[2][0] * rhs.x + lhs.m[2][1] * rhs.y + lhs.m[2][2] * rhs.z + lhs.m[2][3] * rhs.w;
+    result.w = lhs.m[3][0] * rhs.x + lhs.m[3][1] * rhs.y + lhs.m[3][2] * rhs.z + lhs.m[3][3] * rhs.w;
 
     return result;
 }

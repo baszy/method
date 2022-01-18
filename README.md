@@ -6,11 +6,9 @@ only Linux compatible at the moment.
 ![The Stanford Dragon](https://raw.githubusercontent.com/baszy/method/master/screenshots/dragon.png)
 
 ## Features
-- Phong shading model
-- Truevision TGA texture loading
-- Wavefront OBJ model loading
-- Partial normal map support
-- Specular mapping
+- Blinn-Phong shading model + normal, specular mapping
+- Uncompressed TGA texture loading
+- OBJ model loading with shared-vertex optimization for OpenGL
 
 ## Building
 Move to the desired build directory (in-source builds are not recommended) and

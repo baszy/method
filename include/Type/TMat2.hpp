@@ -3,8 +3,11 @@
 #include <cmath>
 #include <cstring>
 
+#include "TVec2.hpp"
+
 namespace method {
 
+// TODO: optimization, parameter checking
 template <typename Type>
 class TMat2 {
 public:
@@ -29,20 +32,58 @@ public:
             std::memcpy(this->m, other.m, 2 * 2 * sizeof(Type));
         }
 
-        return * this;
+        return *this;
     }
 
     const Type * get_data() const {
         return &this->m[0][0];
     }
-
 };
+
+template <typename Type>
+Type cofactor(const TMat2<Type> & source, int i, int j) {
+    Type result;
+
+    return result;
+}
+
+template <typename Type>
+Type determinant(const TMat2<Type> & source) {
+    return source.m[0][0] * source.m[1][1]
+         - source.m[0][1] * source.m[1][0];
+}
+
+template <typename Type>
+TMat2<Type> invert(const TMat2<Type> & source) {
+    TMat2<Type> result;
+
+    Type det = determinant(source);
+
+    result.m[0][0] =  det * source.m[1][1];
+    result.m[0][1] = -det * source.m[1][0];
+    result.m[1][0] = -det * source.m[0][1];
+    result.m[1][1] =  det * source.m[0][0];
+
+    return result;
+}
+
+template <typename Type>
+TMat2<Type> transpose(const TMat2<Type> & source) {
+    TMat2<Type> result;
+
+    result.m[0][0] = source.m[0][0];
+    result.m[0][1] = source.m[1][0];
+
+    result.m[1][0] = source.m[0][1];
+    result.m[1][1] = source.m[1][1];
+
+    return result;
+}
 
 template <typename Type>
 TMat2<Type> operator * (const TMat2<Type> & lhs, const TMat2<Type> & rhs) {
     TMat2<Type> result;
 
-    // TODO: Ripe for optimization
     for (int x = 0; x < 2; x++) {
         for (int y = 0; y < 2; y++) {
             Type dot = 0;
@@ -57,29 +98,11 @@ TMat2<Type> operator * (const TMat2<Type> & lhs, const TMat2<Type> & rhs) {
 }
 
 template <typename Type>
-TMat2<Type> invert(const TMat2<Type> & source) {
-    TMat2<Type> result;
+TVec2<Type> operator * (const TMat2<Type> & lhs, const TVec2<Type> & rhs) {
+    TVec2<Type> result;
 
-    float determinant = 1.0f / (  source.m[0][0] * source.m[1][1]
-                                - source.m[1][0] * source.m[0][1]);
-
-    result.m[0][0] =  determinant * source.m[1][1];
-    result.m[0][1] = -determinant * source.m[1][0];
-    result.m[1][0] = -determinant * source.m[0][1];
-    result.m[1][1] =  determinant * source.m[0][0];
-
-    return result;
-}
-
-template <typename Type>
-TMat2<Type> transpose(const TMat2<Type> & source) {
-    TMat2<Type> result;
-
-    result.m[0][0] = source.m[0][0];
-    result.m[0][1] = source.m[1][0];
-
-    result.m[1][0] = source.m[0][1];
-    result.m[1][1] = source.m[1][1];
+    result.x = dot(rhs, TVec2<Type>(lhs.m[0][0], lhs.m[0][1]));
+    result.y = dot(rhs, TVec2<Type>(lhs.m[0][1], lhs.m[1][1]));
 
     return result;
 }

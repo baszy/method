@@ -13,7 +13,7 @@ MeshData * new_terrain(int power, float width, float height) {
 	assert(power <= METHOD_TERRAIN_POWER_LIMIT);
 			
 	// The power dictates how many subdivisions this mesh will have. E.g. power
-    // of 2 means 2^2 subdivisions = 4 sections squared, where each section is
+    // of 2 means 2^2 subdivisions = 4 sections squared, where each section is::
     // 2 triangles.
     int size = pow(2, power);
     int npoints = size + 1;
@@ -49,10 +49,10 @@ MeshData * new_terrain(int power, float width, float height) {
 
     MeshData * result = new MeshData(points.size(), indices.size());
 
-    result->set_vertices(points.data());
+    result->set_positions(points.data());
     result->set_uvs(uvs.data());
     result->set_bases(bases.data());
-    result->set_indices(indices.data());
+    result->set_faces(indices.data());
 
     return result;
 }

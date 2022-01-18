@@ -3,8 +3,13 @@
 #include <cmath>
 #include <cstring>
 
+#include "TMat2.hpp"
+#include "TVec2.hpp"
+#include "TVec3.hpp"
+
 namespace method {
 
+// TODO: optimization, parameter checking
 template <typename Type>
 class TMat3 {
 public:
@@ -30,36 +35,67 @@ public:
             std::memcpy(this->m, other.m, 3 * 3 * sizeof(Type));
         }
 
-        return * this;
+        return *this;
     }
 
     const Type * get_data() const {
         return &this->m[0][0];
     }
-
 };
 
 template <typename Type>
-TMat3<Type> operator * (const TMat3<Type> & lhs, const TMat3<Type> & rhs) {
-    TMat3<Type> result;
-
-    // TODO: Ripe for optimization
-    for (int x = 0; x < 3; x++) {
-        for (int y = 0; y < 3; y++) {
-            Type dot = 0;
-            for (int k = 0; k < 3; k++) {
-                dot += (rhs.m[x][k] * lhs.m[k][y]);
-            }
-            result.m[x][y] = dot;
-        }
-    }
+TMat2<Type> cofactor(const TMat3<Type> & source, int i, int j) {
+    TMat2<Type> result;
 
     return result;
 }
 
 template <typename Type>
+Type determinant(const TMat3<Type> & source) {
+    return source.m[0][0] * (source.m[1][1] * source.m[2][2] - source.m[2][1] * source.m[1][2])
+         - source.m[1][0] * (source.m[1][0] * source.m[2][2] - source.m[2][1] * source.m[0][2])
+         + source.m[2][0] * (source.m[0][1] * source.m[1][2] - source.m[1][1] * source.m[0][2]);
+}
+
+template <typename Type>
 TMat3<Type> invert(const TMat3<Type> & source) {
     // TODO: implement
+}
+
+template <typename Type>
+TMat3<Type> rotate(Type angle) {
+    TMat3<Type> result;
+
+    Type sina = sin(angle);
+    Type cosa = cos(angle);
+
+    result.m[0][0] = cosa;
+    result.m[1][0] = -sina;
+
+    result.m[0][1] = sina;
+    result.m[1][1] = cosa;
+
+    return result;
+}
+
+template <typename Type>
+TMat3<Type> scale(const TVec2<Type> & scale) {
+    TMat3<Type> result;
+
+    result.m[0][0] = scale.x;
+    result.m[1][1] = scale.y;
+
+    return result;
+}
+
+template <typename Type>
+TMat3<Type> translate(const TVec2<Type> & translation) {
+    TMat3<Type> result;
+
+    result.m[0][2] = translation.x;
+    result.m[1][2] = translation.y;
+
+    return result;
 }
 
 template <typename Type>
@@ -77,6 +113,34 @@ TMat3<Type> transpose(const TMat3<Type> & source) {
     result.m[2][0] = source.m[0][2];
     result.m[2][1] = source.m[1][2];
     result.m[2][2] = source.m[2][2];
+
+    return result;
+}
+
+template <typename Type>
+TMat3<Type> operator * (const TMat3<Type> & lhs, const TMat3<Type> & rhs) {
+    TMat3<Type> result;
+
+    for (int x = 0; x < 3; x++) {
+        for (int y = 0; y < 3; y++) {
+            Type dot = 0;
+            for (int k = 0; k < 3; k++) {
+                dot += (rhs.m[x][k] * lhs.m[k][y]);
+            }
+            result.m[x][y] = dot;
+        }
+    }
+
+    return result;
+}
+
+template <typename Type>
+TVec3<Type> operator * (const TMat3<Type> & lhs, const TVec3<Type> & rhs) {
+    TVec3<Type> result;
+
+    result.x = dot(rhs, TVec3<Type>(lhs.m[0][0], lhs.m[0][1], lhs.m[0][2]));
+    result.y = dot(rhs, TVec3<Type>(lhs.m[1][0], lhs.m[1][1], lhs.m[1][2]));
+    result.z = dot(rhs, TVec3<Type>(lhs.m[2][0], lhs.m[2][1], lhs.m[2][2]));
 
     return result;
 }

@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 
 #include "Framebuffer.hpp"
-#include "GLShader.hpp"
+#include "Shader.hpp"
 #include "Vector.hpp"
 
 #define METHOD_DEFAULT_WINDOW_TITLE "method"
@@ -28,17 +28,17 @@ protected:
     SDL_Window * m_sdl_window;
     SDL_GLContext m_sdl_glcontext;
 
-    GLShader post_shader;
+    Shader post_shader;
 
 public:
     Window();
     Window(const std::string & title, const IVec2 & dimensions);
     ~Window();
 
-    void draw_framebuffer(const Framebuffer & framebuffer);
     IVec2 get_dimensions() const;
     IVec2 get_viewport();
     void grab_cursor(bool enable);
+    void present(const Framebuffer & fb1);
     void set_fullscreen(bool enable);
     void set_position(IVec2 position);
     void set_resizeable(bool enable);

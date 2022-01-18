@@ -1,11 +1,14 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "Camera.hpp"
 #include "Entity.hpp"
+#include "Light.hpp"
 #include "Material.hpp"
 #include "MeshManager.hpp"
+#include "Sky.hpp"
 
 namespace method {
 
@@ -13,37 +16,28 @@ namespace method {
 
 class Prop : public Entity {
 public:
-    const Material * material;
-    HotloaderIndex mesh_handle;
+    const Material & material;
+    std::string mesh;
 
-    Prop(HotloaderIndex mesh, const Material & material);
+    Prop(std::string mesh, const Material & material);
 };
 
-struct DirectionLight {
-    Vec3 direction;
-    Vec3 color;
-};
+class Scene {
+public:
+    const Camera * camera;
+    const Sky * sky;
 
-struct PointLight {
-    Vec3 position;
-    Vec3 color;
-};
-
-struct Scene {
-    Camera * camera;
-    // TODO: Should we use std::vector
     std::vector<Prop *> props;
 
     int point_lights_length;
     Vec3 point_lights_positions[METHOD_MAX_POINT_LIGHTS];
     Vec3 point_lights_colors[METHOD_MAX_POINT_LIGHTS];
 
-    DirectionLight sun;
-
-    Scene();
+    Scene(const Camera & c, const Sky & s);
 
     void add_point_light(const PointLight & light);
-    void set_sun(const DirectionLight & light);
+
+    Vec3 * get_aabb() const;
 };
 
 }

@@ -1,109 +1,100 @@
 #include "MeshManager.hpp"
 
-#include "OBJLoader.hpp"
+#include "MappedFile.hpp"
+#include "ObjLoader.hpp"
 #include "Vector.hpp"
 
-#include <iostream>
+using namespace std;
 
 namespace method {
 
-MeshManager::MeshManager(const std::string & path)
-    : path_base(path) {}
+MeshManager::MeshManager(const string & base_path)
+    : base_path(base_path),
+      meshes() {}
 
-void MeshManager::reload(HotloaderIndex handle) {
-    MeshData * data = load_obj(path_base + source_of(handle));
-    regenerate_basis(data);
+MeshManager::~MeshManager() {
+    for (auto p : meshes) {
+        delete [] p.second.vbo;
+        delete    p.second.data;
+    }
+}
 
-    GLVAO * vao = new GLVAO();
+void MeshManager::reload(string handle) {
+    MappedFile file(base_path + handle, MappedFileMode::READ_ONLY);
+    MeshData * data = load_obj(file);
+    data->regenerate_basis(true);
+
+    auto insertion = meshes.emplace(handle, Mesh());
+    Mesh & mesh = insertion.first->second;
+
+    mesh.vbo_count = 3;
+    mesh.vbo = new GLuint[3];
+    mesh.data = data;
 
     // Create VAO
-    glGenVertexArrays(1, &vao->vao_id);
-    glBindVertexArray(vao->vao_id);
+    glGenVertexArrays(1, &mesh.vao);
+    glBindVertexArray(mesh.vao);
+    glGenBuffers(mesh.vbo_count, mesh.vbo);
 
-    GLuint vbo_ids[3];
-    glGenBuffers(3, vbo_ids);
-    unsigned int vbo_index = 0;
+    unsigned int cur_attrib = 0;
 
     // Vertex positions
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[vbo_index]);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo[0]);
     glBufferData(GL_ARRAY_BUFFER, data->num_vertices * sizeof(Vec3),
-        data->vertices, GL_STATIC_DRAW);
+        data->positions, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(vbo_index, sizeof(Vec3) / sizeof(float),
+    glVertexAttribPointer(cur_attrib, sizeof(Vec3) / sizeof(float),
         GL_FLOAT, GL_FALSE, 0, (void *)(0));
-    glEnableVertexAttribArray(vbo_index);
+    glEnableVertexAttribArray(cur_attrib);
 
-    vbo_index++;
+    cur_attrib++;
 
     // Vertex UVs
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[vbo_index]);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo[1]);
     glBufferData(GL_ARRAY_BUFFER, data->num_vertices * sizeof(Vec2),
         data->uvs, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(vbo_index, sizeof(Vec2) / sizeof(float),
+    glVertexAttribPointer(cur_attrib, sizeof(Vec2) / sizeof(float),
         GL_FLOAT, GL_FALSE, 0, (void *)(0));
-    glEnableVertexAttribArray(vbo_index);
+    glEnableVertexAttribArray(cur_attrib);
 
-    vbo_index++;
+    cur_attrib++;
 
     // Vertex basis vectors
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_ids[vbo_index]);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo[2]);
     glBufferData(GL_ARRAY_BUFFER, data->num_vertices * sizeof(Basis),
         data->bases, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(vbo_index, sizeof(Vec3) / sizeof(float),
+    glVertexAttribPointer(cur_attrib, sizeof(Vec3) / sizeof(float),
         GL_FLOAT, GL_FALSE, 3 * sizeof(Vec3), (void *)(0));
-    glEnableVertexAttribArray(vbo_index);
+    glEnableVertexAttribArray(cur_attrib);
 
-    vbo_index++;
+    cur_attrib++;
 
-    glVertexAttribPointer(vbo_index, sizeof(Vec3) / sizeof(float),
+    glVertexAttribPointer(cur_attrib, sizeof(Vec3) / sizeof(float),
         GL_FLOAT, GL_FALSE, 3 * sizeof(Vec3), (void *)(1 * sizeof(Vec3)));
-    glEnableVertexAttribArray(vbo_index);
+    glEnableVertexAttribArray(cur_attrib);
 
-    vbo_index++;
+    cur_attrib++;
 
-    glVertexAttribPointer(vbo_index, sizeof(Vec3) / sizeof(float),
+    glVertexAttribPointer(cur_attrib, sizeof(Vec3) / sizeof(float),
         GL_FLOAT, GL_FALSE, 3 * sizeof(Vec3), (void *)(2 * sizeof(Vec3)));
-    glEnableVertexAttribArray(vbo_index);
+    glEnableVertexAttribArray(cur_attrib);
 
-    vbo_index++;
+    cur_attrib++;
 
     // Element buffer
-    unsigned int ib;
-    glGenBuffers(1, &ib);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+    glGenBuffers(1, &mesh.ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, data->num_faces * sizeof(IVec3),
-        data->indices, GL_STATIC_DRAW);
-
-    // TODO: useless?
-    glBindVertexArray(0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    vao->num_vbos = vbo_index;
-    vao->num_indices = data->num_faces * 3; // 3 vertices per face :)
-
-    mesh_datas.push_back(data);
-    mesh_vaos.push_back(vao);
+        data->faces, GL_STATIC_DRAW);
 }
 
-MeshManager::~MeshManager() {
-    for (int i = 0; i < mesh_datas.size(); i++) {
-        delete mesh_datas[i];
-    }
-    for (int i = 0; i < mesh_vaos.size(); i++) {
-        delete mesh_vaos[i];
-    }
-}
+const Mesh & MeshManager::get(const string & handle) {
+    if (!meshes.count(handle))
+        reload(handle);
 
-const GLVAO * MeshManager::get(HotloaderIndex handle) {
-    if (!is_loaded(handle)) reload(handle);
-    return mesh_vaos.at(handle);
-}
-
-bool MeshManager::is_loaded(HotloaderIndex handle) const {
-    return handle < mesh_datas.size()
-        && handle < mesh_vaos.size();
+    return meshes.at(handle);
 }
 
 }

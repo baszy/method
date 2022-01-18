@@ -10,33 +10,38 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GL REQUIRED gl)
 pkg_check_modules(SDL2 REQUIRED sdl2 SDL2_image)
 pkg_check_modules(X11 REQUIRED x11 xi)
+pkg_check_modules(PNG REQUIRED libpng)
 
 # Main library
 add_subdirectory("src/")
 add_subdirectory("include/")
+
+add_compile_options(-g -Wall -pedantic -fno-omit-frame-pointer)
 
 add_library(method ${METHOD_SOURCES})
 set_target_properties(method PROPERTIES LINKER_LANGUAGE CXX CXX_STANDARD 11
     POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(method PUBLIC ${GL_INCLUDE_DIRS}
-    ${SDL2_INCLUDE_DIRS} ${X11_INCLUDE_DIRS} ${GLAD_INCLUDE_DIRS}
-    ${METHOD_INCLUDE_DIRS})
+    ${SDL2_INCLUDE_DIRS} ${X11_INCLUDE_DIRS} ${PNG_INCLUDE_DIRS}
+    ${GLAD_INCLUDE_DIRS} ${METHOD_INCLUDE_DIRS})
 target_link_libraries(method PRIVATE ${GL_LIBRARIES} ${SDL2_LIBRARIES}
-    ${X11_LIBRARIES} ${GLAD_LIBRARIES} ${CMAKE_DL_LIBS} m)
+    ${X11_LIBRARIES} ${PNG_LIBRARIES} ${GLAD_LIBRARIES} ${CMAKE_DL_LIBS} m pthread)
 target_compile_options(method PRIVATE ${GL_CFLAGS_OTHER} ${SDL2_CFLAGS_OTHER}
-    ${X11_CFLAGS_OTHER} -g -Wall -Wextra)
+    ${X11_CFLAGS_OTHER})
 
 # Tools
-# add_subdirectory("tools/")
-# 
-# add_executable(method_builder ${METHOD_BUILDER_SOURCES})
-# set_target_properties(method_builder PROPERTIES LINKER_LANGUAGE CXX
-#     CXX_STANDARD 11)
-# 
-# target_include_directories(method_builder PUBLIC "tools/")
-# target_link_libraries(method_builder PRIVATE method)
-# target_compile_options(method_builder PRIVATE -g -Wall -Wextra)
+add_subdirectory("tools/")
+
+add_executable(method_builder ${METHOD_BUILDER_SOURCES})
+set_target_properties(method_builder PROPERTIES LINKER_LANGUAGE CXX
+    CXX_STANDARD 11)
+
+target_include_directories(method_builder PUBLIC "tools/"
+    ${SDL_INCLUDE_DIRS} ${SDL_IMAGE_INCLUDE_DIRS})
+target_link_libraries(method_builder PRIVATE method
+    ${SDL_LIBRARIES} ${SDL_IMAGE_LIBRARIES})
+target_compile_options(method_builder PRIVATE ${SDL2_CFLAGS_OTHER})
 
 # Example project
 add_subdirectory("example/")
@@ -47,7 +52,7 @@ set_target_properties(method_example PROPERTIES LINKER_LANGUAGE CXX
 
 target_include_directories(method_example PUBLIC "example/")
 target_link_libraries(method_example PRIVATE method)
-target_compile_options(method_example PRIVATE -g -Wall -Wextra)
+target_compile_options(method_example PRIVATE)
 
 # Generating documentation using Doxygen
 find_package(Doxygen)

@@ -1,34 +1,36 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 #include "glad/glad.h"
 
-#include "Hotloader.hpp"
 #include "TextureData.hpp"
 
 namespace method {
 
-struct GLTexture {
-    unsigned int id;
+class Texture {
+public:
+    GLuint id;
+    TextureData * data;
 };
 
-class TextureManager : public Hotloader {
+class TextureManager{
 private:
-    std::vector<TextureData *> texture_datas;
-    std::vector<GLTexture *> texture_objects;
-
-    std::string path_base;
-
-    void reload(HotloaderIndex handle);
+    std::string base_path;
+    std::unordered_map<std::string, Texture> textures;
 
 public:
     TextureManager(const std::string & path);
     ~TextureManager();
 
-    const GLTexture * get(HotloaderIndex handle);
-    bool is_loaded(HotloaderIndex handle) const;
+    TextureManager(const TextureManager & other)               = delete;
+    TextureManager(TextureManager && other)                    = delete;
+    TextureManager & operator = (const TextureManager & other) = delete;
+    TextureManager & operator = (TextureManager && other)      = delete;
+
+    void reload(const std::string & handle);
+    const Texture & get(const std::string & handle);
 };
 
 }

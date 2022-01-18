@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <Type/TVec2.hpp>
+
 namespace method {
 
 template <typename Type>
@@ -13,11 +15,15 @@ public:
     TVec3()
         : TVec3(0, 0, 0) {}
 
-    TVec3(Type all)
+    explicit TVec3(Type all)
         : TVec3(all, all, all) {}
 
     TVec3(Type x, Type y, Type z)
         : x(x), y(y), z(z) {}
+
+    // Dimension constructors
+    TVec3(TVec2<Type> xy, Type z)
+        : x(xy.x), y(xy.y), z(z) {}
 };
 
 template <typename Type>
@@ -106,5 +112,11 @@ template <typename Type>
 Type dot(const TVec3<Type> & lhs, const TVec3<Type> & rhs) {
     return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z);
 }
+
+// Template specializations
+
+bool operator == (const TVec3<bool> & lhs, const TVec3<bool> & rhs);
+bool operator == (const TVec3<int> & lhs, const TVec3<int> & rhs);
+bool operator == (const TVec3<unsigned int> & lhs, const TVec3<unsigned int> & rhs);
 
 }

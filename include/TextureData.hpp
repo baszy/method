@@ -1,15 +1,25 @@
 #pragma once
 
-#include "Vector.hpp"
+#include "Defs.hpp"
 
 namespace method {
 
-struct TextureData {
-    unsigned int width, height;
-    unsigned int bpp;
-    bool srgb;
+class TextureData {
+public:
+    U32 width, height;
+    U32 bpp;
 
-    char * image_data;
+    bool srgb;
+    bool rgb;
+
+    U8 * data;
+
+    ~TextureData();
+
+    /**
+     * \brief Vertically flips the image data.
+     */
+    void flip();
 };
 
 }
