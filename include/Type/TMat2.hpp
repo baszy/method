@@ -1,13 +1,12 @@
 #pragma once
 
-#include <cmath>
 #include <cstring>
 
+#include "Math.hpp"
 #include "TVec2.hpp"
 
 namespace method {
 
-// TODO: optimization, parameter checking
 template <typename Type>
 class TMat2 {
 public:
@@ -19,7 +18,7 @@ public:
         this->m[1][1] = 1;
     }
 
-    TMat2(Type elements[2][2]) {
+    explicit TMat2(Type elements[2][2]) {
         std::memcpy(this->m, elements, 2 * 2 * sizeof(Type));
     }
 
@@ -41,28 +40,22 @@ public:
 };
 
 template <typename Type>
-Type cofactor(const TMat2<Type> & source, int i, int j) {
-    Type result;
-
-    return result;
-}
-
-template <typename Type>
 Type determinant(const TMat2<Type> & source) {
     return source.m[0][0] * source.m[1][1]
          - source.m[0][1] * source.m[1][0];
 }
 
 template <typename Type>
-TMat2<Type> invert(const TMat2<Type> & source) {
+TMat2<Type> inverse(const TMat2<Type> & source) {
     TMat2<Type> result;
 
-    Type det = determinant(source);
+    Type div = 1 / determinant(source);
 
-    result.m[0][0] =  det * source.m[1][1];
-    result.m[0][1] = -det * source.m[1][0];
-    result.m[1][0] = -det * source.m[0][1];
-    result.m[1][1] =  det * source.m[0][0];
+    result.m[0][0] =  div * source.m[1][1];
+    result.m[0][1] = -div * source.m[0][1];
+
+    result.m[1][0] = -div * source.m[1][0];
+    result.m[1][1] =  div * source.m[0][0];
 
     return result;
 }

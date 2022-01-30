@@ -1,14 +1,16 @@
 #pragma once
 
-#include <cmath>
 #include <cstring>
 
-#include "Type/TVec3.hpp"
-#include "Type/TVec4.hpp"
+#include "Math.hpp"
+#include "TMat2.hpp"
+#include "TMat3.hpp"
+#include "TVec2.hpp"
+#include "TVec3.hpp"
+#include "TVec4.hpp"
 
 namespace method {
 
-// TODO: optimization, parameter checking
 template <typename Type>
 class TMat4 {
 public:
@@ -22,7 +24,7 @@ public:
         this->m[3][3] = 1;
     }
 
-    TMat4(Type elements[4][4]) {
+    explicit TMat4(Type elements[4][4]) {
         std::memcpy(this->m, elements, 4 * 4 * sizeof(Type));
     }
 
@@ -43,12 +45,9 @@ public:
     }
 };
 
-template <typename Type>
-TMat3<Type> cofactor(const TMat4<Type> & source, int i, int j) {
-    TMat3<Type> result;
+#if 0
 
-    return result;
-}
+// TODO: Inverse, affine inverse
 
 template <typename Type>
 Type determinant(const TMat4<Type> & source) {
@@ -56,8 +55,41 @@ Type determinant(const TMat4<Type> & source) {
 }
 
 template <typename Type>
-TMat4<Type> invert(const TMat4<Type> & source) {
-    // TODO: implement
+TMat4<Type> inverse(const TMat4<Type> & source) {
+    TMat4<Type> result;
+
+    Type div = 1 / determinant(source);
+
+    return result;
+}
+
+#endif
+
+template <typename Type>
+TMat4<Type> transpose(const TMat4<Type> & source) {
+    TMat4<Type> result;
+
+    result.m[0][0] = source.m[0][0];
+    result.m[0][1] = source.m[1][0];
+    result.m[0][2] = source.m[2][0];
+    result.m[0][3] = source.m[3][0];
+
+    result.m[1][0] = source.m[0][1];
+    result.m[1][1] = source.m[1][1];
+    result.m[1][2] = source.m[2][1];
+    result.m[1][3] = source.m[3][1];
+
+    result.m[2][0] = source.m[0][2];
+    result.m[2][1] = source.m[1][2];
+    result.m[2][2] = source.m[2][2];
+    result.m[2][3] = source.m[3][2];
+
+    result.m[3][0] = source.m[0][3];
+    result.m[3][1] = source.m[1][3];
+    result.m[3][2] = source.m[2][3];
+    result.m[3][3] = source.m[3][3];
+
+    return result;
 }
 
 template <typename Type>
@@ -163,33 +195,6 @@ TMat4<Type> translate(const TVec3<Type> & translation) {
     result.m[3][0] = translation.x;
     result.m[3][1] = translation.y;
     result.m[3][2] = translation.z;
-
-    return result;
-}
-
-template <typename Type>
-TMat4<Type> transpose(const TMat4<Type> & source) {
-    TMat4<Type> result;
-
-    result.m[0][0] = source.m[0][0];
-    result.m[0][1] = source.m[1][0];
-    result.m[0][2] = source.m[2][0];
-    result.m[0][3] = source.m[3][0];
-
-    result.m[1][0] = source.m[0][1];
-    result.m[1][1] = source.m[1][1];
-    result.m[1][2] = source.m[2][1];
-    result.m[1][3] = source.m[3][1];
-
-    result.m[2][0] = source.m[0][2];
-    result.m[2][1] = source.m[1][2];
-    result.m[2][2] = source.m[2][2];
-    result.m[2][3] = source.m[3][2];
-
-    result.m[3][0] = source.m[0][3];
-    result.m[3][1] = source.m[1][3];
-    result.m[3][2] = source.m[2][3];
-    result.m[3][3] = source.m[3][3];
 
     return result;
 }

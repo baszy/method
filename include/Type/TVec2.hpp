@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cmath>
+#include "Math.hpp"
 
 namespace method {
 
@@ -41,6 +41,13 @@ TVec2<Type> operator + (const TVec2<Type> & lhs, const TVec2<Type> & rhs) {
 }
 
 template <typename Type>
+TVec2<Type> operator += (TVec2<Type> & lhs, const TVec2<Type> & rhs) {
+    lhs.x += rhs.x;
+    lhs.y += rhs.y;
+    return lhs;
+}
+
+template <typename Type>
 TVec2<Type> operator - (const TVec2<Type> & lhs, const TVec2<Type> & rhs) {
     TVec2<Type> result;
 
@@ -51,6 +58,13 @@ TVec2<Type> operator - (const TVec2<Type> & lhs, const TVec2<Type> & rhs) {
 }
 
 template <typename Type>
+TVec2<Type> operator -= (TVec2<Type> & lhs, const TVec2<Type> & rhs) {
+    lhs.x -= rhs.x;
+    lhs.y -= rhs.y;
+    return lhs;
+}
+
+template <typename Type>
 TVec2<Type> operator * (Type lhs, const TVec2<Type> & rhs) {
     TVec2<Type> result;
 
@@ -58,6 +72,30 @@ TVec2<Type> operator * (Type lhs, const TVec2<Type> & rhs) {
     result.y = lhs * rhs.y;
 
     return result;
+}
+
+template <typename Type>
+TVec2<Type> operator *= (TVec2<Type> & lhs, Type rhs) {
+    lhs.x *= rhs;
+    lhs.y *= rhs;
+    return lhs;
+}
+
+template <typename Type>
+TVec2<Type> operator / (const TVec2<Type> & lhs, Type rhs) {
+    TVec2<Type> result;
+
+    result.x = (1 / lhs) * lhs.x;
+    result.y = (1 / lhs) * lhs.y;
+
+    return result;
+}
+
+template <typename Type>
+TVec2<Type> operator /= (TVec2<Type> & lhs, Type rhs) {
+    lhs.x *= (1 / rhs);
+    lhs.y *= (1 / rhs);
+    return lhs;
 }
 
 template <typename Type>
@@ -81,10 +119,14 @@ Type dot(const TVec2<Type> & lhs, const TVec2<Type> & rhs) {
     return (lhs.x * rhs.x) + (lhs.y * rhs.y);
 }
 
-// Template specializations
+template <typename Type>
+bool operator == (const TVec2<Type> & lhs, const TVec2<Type> & rhs) {
+    return lhs.x == rhs.x && lhs.y == rhs.y;
+}
 
-bool operator == (const TVec2<bool> & lhs, const TVec2<bool> & rhs);
-bool operator == (const TVec2<int> & lhs, const TVec2<int> & rhs);
-bool operator == (const TVec2<unsigned int> & lhs, const TVec2<unsigned int> & rhs);
+template <typename Type>
+bool operator != (const TVec2<Type> & lhs, const TVec2<Type> & rhs) {
+    return lhs.x != rhs.x || lhs.y != rhs.y;
+}
 
 }

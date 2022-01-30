@@ -1,15 +1,17 @@
 #pragma once
 
+#include "TVec3.hpp"
+
 namespace method {
 
 // TODO: Use
 template <typename Type>
-class AABB {
+class TAABB {
 public:
     TVec3<Type> position;
     // std::array<TVec3<Type>, 8> vertices;
 
-    AABB(TVec3<Type> position)
+    TAABB(TVec3<Type> position)
         : position(position) {}
 };
 

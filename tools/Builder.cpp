@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#include "Angle.hpp"
+#include "Math.hpp"
 #include "Matrix.hpp"
 #include "World.hpp"
 #include "Vector.hpp"

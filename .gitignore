@@ -1,6 +1,7 @@
 # Compiled binaries
 bin/
 build/
+test/
 
 # Build remnants
 *.o

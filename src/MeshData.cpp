@@ -91,7 +91,7 @@ void MeshData::regenerate_basis(bool preserve_normals) {
 
         float duv_elements[2][2] = {{uv_edge_1.x, uv_edge_2.x},
                                     {uv_edge_1.y, uv_edge_2.y}};
-        Mat2 duv = invert(Mat2(duv_elements));
+        Mat2 duv = inverse(Mat2(duv_elements));
 
         Vec3 tangent = Vec3(duv.m[0][0] * pos_edge_1.x + duv.m[0][1] * pos_edge_2.x,
                             duv.m[0][0] * pos_edge_1.y + duv.m[0][1] * pos_edge_2.y,
