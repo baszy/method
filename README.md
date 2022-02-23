@@ -1,7 +1,7 @@
 # method
 Experimental OpenGL 3D rendering engine. Only Linux-compatible at the moment.
 
-![Dabrovic Sponza](https://media.githubusercontent.com/media/baszy/method/master/screenshots/sponza.png)
+![Dabrovic Sponza](https://github.com/baszy/method/raw/master/screenshots/sponza.png)
 
 ## Features
 - Blinn-Phong shading model + normal, specular mapping
